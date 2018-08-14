@@ -2,10 +2,12 @@
 echo "post ssh"
 
 FUSION_HOME=${FUSION_HOME}/4.1.0
+SEARCHHUB_HOME=${SEARCHHUB_HOME}
+USERNAME=${USERNAME}
 
-echo ${INSTALLER_HOME}
 echo ${FUSION_HOME}
 echo ${SEARCHHUB_HOME}
+echo ${USERNAME}
 
 
 echo "Downloading and installing additional required packages"
@@ -23,8 +25,14 @@ echo ""
 echo ""
 
 echo "Removing old Fusion install"
-rm -r $FUSION_HOME
+rm -r ${FUSION_HOME}
 echo ""
+
+if [ ! -e "/home/${USERNAME}/fusion-4.1.0.tar.gz" ]; then
+echo "Fusion file not found, downloading!"
+wget https://download.lucidworks.com/fusion-4.1.0/fusion-4.1.0.tar.gz
+fi
+echo "Fusion downloaded"
 echo ""
 
 echo "Extracting Fusion 4.1.0"
@@ -33,7 +41,7 @@ echo ""
 echo ""
 
 echo "Editing config files"
-mv fusion.properties $FUSION_HOME/conf
+mv fusion.properties ${FUSION_HOME}/conf
 echo ""
 echo ""
 
@@ -48,11 +56,11 @@ echo ""
 echo ""
 
 echo "Downloading SearchHub"
-mkdir -p $SEARCHHUB_HOME
-cd $SEARCHHUB_HOME
+mkdir -p ${SEARCHHUB_HOME}
+cd ${SEARCHHUB_HOME}
 git clone https://github.com/lucidworks/searchhub.git
 SEARCHHUB_HOME=${SEARCHHUB_HOME}/searchhub
-cd $SEARCHHUB_HOME
+cd ${SEARCHHUB_HOME}
 git fetch origin
 git checkout -t origin/4_1_upgrade
 echo ""
