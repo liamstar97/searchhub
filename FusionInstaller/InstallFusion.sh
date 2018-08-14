@@ -1,6 +1,6 @@
 #!/bin/bash
 
-INSTALLER_HOME=$(pwd)
+INSTALLER_HOME="$(dirname -- "${BASH_SOURCE-$0}")"
 USERNAME=ubuntu
 
 #Checks for options, exits if none are used
