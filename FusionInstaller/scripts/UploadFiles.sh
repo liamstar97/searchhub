@@ -12,5 +12,9 @@ scp -i ${IDENTITY_FILE} ${INSTALLER_HOME}/scripts/FusionInstaller.sh ${USERNAME}
 scp -i ${IDENTITY_FILE} ${INSTALLER_HOME}/conf/fusion.properties ${USERNAME}@${SSH_HOSTNAME}:
 scp -i ${IDENTITY_FILE} ${INSTALLER_HOME}/conf/myenv.sh.tmpl ${USERNAME}@${SSH_HOSTNAME}:
 scp -i ${IDENTITY_FILE} ${INSTALLER_HOME}/conf/password_file.json.tmpl ${USERNAME}@${SSH_HOSTNAME}:
+
+#THIS MUST GET FIXED AND REMOVED!
+scp -i ${IDENTITY_FILE} ${INSTALLER_HOME}/conf/license.properties ${USERNAME}@${SSH_HOSTNAME}:~/.fusion/
+
 echo "Upload complete"
 echo ""

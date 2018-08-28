@@ -1,0 +1,24 @@
+Usage: LaunchInstance.sh [OPTIONS]
+
+Used for launching fresh instances with or without fusion+searchhub on AWS
+   -a | --access-key [KEY]	Set you're aws user's public access key
+   -f | --install-fusion
+				Install fusion on newly created instance
+   -g | --security-group-name [NAME]
+				Set security group name that will be created on aws
+   -i | --identity [NAME]
+				Set the identity file name that will be created on aws
+   -r | --region-name [REGION ID]
+				Set the region you're server will be launched in, check online for region ID's
+   -s | --secret-key [KEY] 	
+				Set you're aws user's secret key (this can also be done with 
+   -u | --username [USERNAME]
+				Set the username that will be used for SSH and SCP protocalls,
+				as well as Fusion/SearchHub home directories
+
+If no options are given names will be randomly generated and given to security-group-name, identity name, and username.
+ 
+
+Examples:	./LaunchInstance.sh -f
+		./LaunchInstance.sh -i foo -g bar -f
+		./LaunchInstance.sh --identity foo --security-group-name bar -f

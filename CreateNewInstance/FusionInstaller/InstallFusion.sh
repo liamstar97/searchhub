@@ -2,6 +2,10 @@
 
 INSTALLER_HOME="$(dirname -- "${BASH_SOURCE-$0}")"
 USERNAME=ubuntu
+DATA_SOURCES=0
+TWIGKIT_CREDENTIALS="/conf/toBeRemoved/settings.xml"
+FUSION_LICENSE="/conf/toBeRemoved/license.properties"
+
 
 #Checks for options, exits if none are used
 if [ $# == 0 ]; then
@@ -15,7 +19,7 @@ username_set=0
 hostname_set=0
 
 #executes options
-options=$(getopt -o f:hH:i:s:u: --long fusion_home:,help,hostname:,identity:,searchhub_home:,username: -- "$@")
+options=$(getopt -o -d:f:hH:l:i:s:t:u: --long fusion_home:,help,hostname:,fusion-license:,identity:,searchhub_home:,twigkit-credentials:,username: -- "$@")
 [ $? -eq 0 ] || {
     echo "exiting"
     exit 1
@@ -23,7 +27,14 @@ options=$(getopt -o f:hH:i:s:u: --long fusion_home:,help,hostname:,identity:,sea
 eval set -- "$options"
 while true; do
     case $1 in
-            -f | --fusion_home)
+            -d  | --datasource-quantity)
+                if [[ $2 == -* ]]; then
+                    missing_argument=${2}
+                fi
+                DATA_SOURCES=${2}
+                shift 2
+                ;;
+            -f  | --fusion_home)
                 if [[ $2 == -* ]]; then
                     missing_argument=${2}
                 fi
@@ -31,11 +42,11 @@ while true; do
                 fusion_home_set=1
                 shift 2
                 ;;
-            -h | --help)
+            -h  | --help)
                 cat ./README
                 exit 1
                 ;;
-            -H | --hostname)
+            -H  | --hostname)
                 if [[ $2 == -* ]]; then
                     missing_argument=${2}
                 fi
@@ -43,14 +54,20 @@ while true; do
                 hostname_set=1
                 shift 2
                 ;;
-            -i | --identity)
+            -l  | --fusion-license)
+                if [[ $2 == -* ]]; then
+                    missing_argument=${2}
+                fi
+                shift 2
+                ;;
+            -i  | --identity)
                 if [[ $2 == -* ]]; then
                     missing_argument=${2}
                 fi
                 IDENTITY_FILE=${2}
                 shift 2
                 ;;
-            -s | --searchhub_home)
+            -s  | --searchhub_home)
                 if [[ $2 == -* ]]; then
                     missing_argument=${2}
                 fi
@@ -58,7 +75,14 @@ while true; do
                 searchhub_home_set=1
                 shift 2
                 ;;
-            -u | --username)
+            -t  | --twigkit-credentials)
+                if [[ $2 == -* ]]; then
+                    missing_argument=${2}
+                fi
+                TWIGKIT_CREDENTIALS=${2}
+                shift 2
+                ;;
+            -u  | --username)
                 if [[ $2 == -* ]]; then
                     missing_argument=${2}
                 fi
@@ -78,7 +102,7 @@ if [ "${missing_argument}" != "" ]; then
     exit 1
 fi
 
-if [ "${USERNAME}" != "" ]; then
+if [ "$USERNAME" != "" ]; then
     FUSION_HOME=/home/${USERNAME}/${FUSION_HOME}
 fi
 
@@ -90,19 +114,9 @@ if [ ${searchhub_home_set} == 0 ]; then
     SEARCHHUB_HOME=/home/${USERNAME}/src/lucidworks/searchhub
 fi
 
-SSH_COUNTER=0
-echo "ensuring ssh connection to the server is good"
-SSH_COUNTER=0
-while [[ $(ssh -i ${IDENTITY_FILE} "${USERNAME}@${SSH_HOSTNAME}"  echo "ok")  != "ok" ]]; do
-    if [ ${SSH_COUNTER} == 60 ]; then
-        echo "it appears that its taking longer to connect to the server than usual, please check if the server is running and try again."
-        exit 1
-    fi
-    echo -n "."
-    sleep 5
-    SSH_COUNTER=$((${SSH_COUNTER} + 5))
-done
+echo ${TWIGKIT_CREDENTIALS}
+echo ${FUSION_LICENSE}
 
 #exports vars and runs UploadFiles.sh
 . ${INSTALLER_HOME}/scripts/UploadFiles.sh
-ssh -i ${IDENTITY_FILE} ${USERNAME}@${SSH_HOSTNAME} "export USERNAME=${USERNAME}; export FUSION_HOME=${FUSION_HOME}; export SEARCHHUB_HOME=${SEARCHHUB_HOME}; ./FusionInstaller.sh"
+ssh -i ${IDENTITY_FILE} ${USERNAME}@${SSH_HOSTNAME} "export USERNAME=${USERNAME}; export FUSION_HOME=${FUSION_HOME}; export SEARCHHUB_HOME=${SEARCHHUB_HOME}; export DATA_SOURCES=${DATA_SOURCES}; ./FusionInstaller.sh"

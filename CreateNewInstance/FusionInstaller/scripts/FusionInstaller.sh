@@ -4,6 +4,7 @@ echo "post ssh"
 FUSION_HOME=${FUSION_HOME}/4.1.0
 SEARCHHUB_HOME=${SEARCHHUB_HOME}
 USERNAME=${USERNAME}
+DATA_SOURCES=${DATA_SOURCES}
 
 echo ${FUSION_HOME}
 echo ${SEARCHHUB_HOME}
@@ -16,6 +17,7 @@ sudo apt-get -y -qq install gradle
 sudo apt-get -y -qq install maven
 sudo apt-get -y -qq install scala
 sudo apt-get -y -qq install default-jdk
+sudo apt-get -y -qq install zip
 echo ""
 echo ""
 
@@ -24,9 +26,9 @@ ${FUSION_HOME}/bin/fusion stop
 echo ""
 echo ""
 
-#echo "Removing old Fusion install"
-#rm -r ${FUSION_HOME}
-#echo ""
+echo "Removing old Fusion install"
+rm -r ${FUSION_HOME}
+echo ""
 
 if [ ! -e "/home/${USERNAME}/fusion-4.1.0.tar.gz" ]; then
 echo "Fusion file not found, downloading!"
@@ -82,3 +84,7 @@ echo ""
 echo ""
 
 echo "Done!"
+
+#move this to InstallFusion
+echo "Indexing datasources"
+~/IndexSearchHubDatasources.sh -d ${DATA_SOURCES}
