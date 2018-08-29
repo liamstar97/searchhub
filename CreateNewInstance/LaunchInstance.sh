@@ -8,8 +8,14 @@ VOLUME_SIZE=0
 DATE=$(date +%y%m%d%R:%S)
 DATA_SOURCES=0
 CLUSTER_SIZE=0
-FUSION_LICENSE=""
-TWIGKIT_CREDENTIALS=""
+FUSION_LICENSE="0"
+TWIGKIT_CREDENTIALS="0"
+
+#Checks for options, exits if none are used
+if [ $# == 0 ]; then
+    echo "missing options, please use -h or --help to see all available options"
+    exit 1
+fi
 
 #options
 options=$(getopt -o a:c:d:fg:hi:l:r:s:t:u: --long access-key:,cluster-size:,datasource-quantity:,install-fusion,security-groupname:,region-name:,secret-key:,twigkit-credentials:,help,identity:,fusion-license:,username: -- "$@")
@@ -20,34 +26,27 @@ options=$(getopt -o a:c:d:fg:hi:l:r:s:t:u: --long access-key:,cluster-size:,data
 eval set -- "$options"
 while true; do
     case $1 in
-            -a  | --access-key)
-                if [[ $2 == -* ]]; then
-                    missing_argument=${2}
-                fi
-                AWS_ACCESS_KEY=${2}
-                shift 2
-                ;;
             -c  | --cluster-size)
                 if [[ $2 == -* ]]; then
-                    missing_argument=${2}
+                    missing_argument=${1}
                 fi
                 CLUSTER_SIZE=${2}
                 shift 2
                 ;;
             -d  | --datasource-quantity)
                 if [[ $2 == -* ]]; then
-                    missing_argument=${2}
+                    missing_argument=${1}
                 fi
                 DATA_SOURCES=${2}
                 shift 2
                 ;;
             -f  | --install-fusion)
                 INSTALL_FUSION=1
-                shift 1
+                shift
                 ;;
             -g  | --security-groupname)
                 if [[ $2 == -* ]]; then
-                    missing_argument=${2}
+                    missing_argument=${1}
                 fi
                 SECURITY_GROUP_NAME=${2}
                 shift 2
@@ -58,7 +57,7 @@ while true; do
                 ;;
             -i  | --identity)
                 if [[ $2 == -* ]]; then
-                    missing_argument=${2}
+                    missing_argument=${1}
                 fi
                 IDENTITY_FILE=${2}
                 shift 2
@@ -69,35 +68,28 @@ while true; do
                 ;;
             -r  | --region-name)
                 if [[ $2 == -* ]]; then
-                    missing_argument=${2}
+                    missing_argument=${1}
                 fi
                 REGION=${2}
                 shift 2
                 ;;
-            -s  | --secret-key)
-                if [[ $2 == -* ]]; then
-                    missing_argument=${2}
-                fi
-                AWS_SECRET_KEY=${2}
-                shift 2
-                ;;
             -t  | --twigkit-credentials)
                 if [[ $2 == -* ]]; then
-                    missing_argument=${2}
+                    missing_argument=${1}
                 fi
                 TWIGKIT_CREDENTIALS=${2}
                 shift 2
                 ;;
             -u  | --username)
                 if [[ $2 == -* ]]; then
-                    missing_argument=${2}
+                    missing_argument=${1}
                 fi
                 USERNAME=${2}
                 shift 2
                 ;;
             -v  | --volume-size)
                 if [[ $2 == -* ]]; then
-                    missing_argument=${2}
+                    missing_argument=${1}
                 fi
                 VOLUME_SIZE=${2}
                 shift 2
@@ -134,13 +126,13 @@ if [ ${VOLUME_SIZE} == 0 ]; then
     VOLUME_SIZE=32
 fi
 
-if [ ${TWIGKIT_CREDENTIALS} == "" ]; then
-    echo "please use -t to set the destination of the gradle settings.xml file"
+if [[ ${TWIGKIT_CREDENTIALS} == "0" && ${INSTALL_FUSION} == "1" ]]; then
+    echo "please use -t to set the destination of the gradle settings.xml file otherwise the installation of fusion will fail"
     exit 1;
 fi
 
-if [ ${FUSION_LICENSE} == "" ]; then
-    echo "please use -l to set the destination of the license.properties file"
+if [[ ${FUSION_LICENSE} == "0" && ${INSTALL_FUSION} == 1 ]]; then
+    echo "please use -l to set the destination of the license.properties file otherwise the installation of fusion will fail"
     exit 1;
 fi
 ##########################################################################################
@@ -150,12 +142,19 @@ fi
 if ! type "aws" > /dev/null; then
     echo "installing aws api"
     pip install awscli --upgrade --user
+    echo "you must run \"aws configure\" on the commandline to complete the aws cli setup"
+    exit 1;
 else
     echo "aws api already installed"
 fi
 
 #check for awscli auth
-
+if [[ $(aws configure list | grep secret_key | grep None)  != "" ]]; then
+    echo "no aws profile detected, please use \"aws configure\" on the commandline before running this script"
+    exit 1;
+else
+    echo "aws profile exists!"
+fi
 
 ##########################################################################################
 #Check for security group and create it if it does not exist.
@@ -265,9 +264,9 @@ VOLUME_ID=$(aws ec2 describe-instances --instance-ids "${INSTANCE_ID}" --query '
 VOLUME_ID="${VOLUME_ID%\"}"
 VOLUME_ID="${VOLUME_ID#\"}"
 aws ec2 modify-volume --volume-id ${VOLUME_ID} --size ${VOLUME_SIZE} --volume-type io1 --iops 100
+sleep 10
 while [[ $(ssh -Y -i "~/.ssh/${IDENTITY_FILE}.pem" "${USERNAME}@${PUBLIC_DNS}"  "lsblk --json | grep xvda1 | grep ${VOLUME_SIZE}G") == "" ]]; do
     ssh -Y -i "~/.ssh/${IDENTITY_FILE}.pem" "${USERNAME}@${PUBLIC_DNS}"  "sudo growpart /dev/xvda 1"
-    sleep 10
 done
 ssh -Y -i "~/.ssh/${IDENTITY_FILE}.pem" "${USERNAME}@${PUBLIC_DNS}"  "sudo resize2fs /dev/xvda1"
 

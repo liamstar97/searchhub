@@ -1,24 +1,27 @@
 Usage: LaunchInstance.sh [OPTIONS]
 
 Used for launching fresh instances with or without fusion+searchhub on AWS
-   -a | --access-key [KEY]	Set you're aws user's public access key
+   -c | --cluster-size		Set the ammount of servers you would like to run fusion on, 
+				will assume 1 if option is not used
+   -d | --datasource-quantity	Setsthe number of datasources to index once fusion is installed
    -f | --install-fusion
-				Install fusion on newly created instance
+				Install fusion on newly created instance(s)
    -g | --security-group-name [NAME]
 				Set security group name that will be created on aws
    -i | --identity [NAME]
 				Set the identity file name that will be created on aws
+   -l | --fusion-license	Set the license.properties path for the fusion license
    -r | --region-name [REGION ID]
 				Set the region you're server will be launched in, check online for region ID's
-   -s | --secret-key [KEY] 	
-				Set you're aws user's secret key (this can also be done with 
+   -t | --twigkit-credentials	Set the path for settings.xml. Used for twigkit install
    -u | --username [USERNAME]
 				Set the username that will be used for SSH and SCP protocalls,
 				as well as Fusion/SearchHub home directories
+   -v | --volume-size		Set ec2 volume size (32G by default)
 
-If no options are given names will be randomly generated and given to security-group-name, identity name, and username.
+If no options are given names will be randomly generated and given to security-group-name, and identity-name.
  
 
 Examples:	./LaunchInstance.sh -f
 		./LaunchInstance.sh -i foo -g bar -f
-		./LaunchInstance.sh --identity foo --security-group-name bar -f
+		./LaunchInstance.sh -l ~/foo/bar/license.properties -t ~/bear/baz/settings.xml -f

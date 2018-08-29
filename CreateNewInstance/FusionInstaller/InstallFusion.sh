@@ -3,15 +3,9 @@
 INSTALLER_HOME="$(dirname -- "${BASH_SOURCE-$0}")"
 USERNAME=ubuntu
 DATA_SOURCES=0
-TWIGKIT_CREDENTIALS="/conf/toBeRemoved/settings.xml"
-FUSION_LICENSE="/conf/toBeRemoved/license.properties"
+TWIGKIT_CREDENTIALS=""
+FUSION_LICENSE=""
 
-
-#Checks for options, exits if none are used
-if [ $# == 0 ]; then
-    echo "missing options, please use -h or --help to see all available options"
-    exit 1
-fi
 
 fusion_home_set=0
 searchhub_home_set=0
