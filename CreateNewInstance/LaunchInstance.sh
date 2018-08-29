@@ -10,6 +10,7 @@ DATA_SOURCES=0
 CLUSTER_SIZE=0
 FUSION_LICENSE="0"
 TWIGKIT_CREDENTIALS="0"
+VPC_ID=""
 
 #Checks for options, exits if none are used
 if [ $# == 0 ]; then
@@ -142,6 +143,8 @@ fi
 if ! type "aws" > /dev/null; then
     echo "installing aws api"
     pip install awscli --upgrade --user
+    export PATH=
+    source
     echo "you must run \"aws configure\" on the commandline to complete the aws cli setup"
     exit 1;
 else
@@ -160,7 +163,11 @@ fi
 #Check for security group and create it if it does not exist.
 ##########################################################################################
 echo "Creating security group"
-SECURITY_GROUP_ID=$(aws ec2 create-security-group --group-name ${SECURITY_GROUP_NAME} --description "security group for automatically created instance: ${DATE}")
+if [[ VPC-ID != "" ]]; then
+    SECURITY_GROUP_ID=$(aws ec2 create-security-group --group-name ${SECURITY_GROUP_NAME} --vpc-id  --description "security group for automatically created instance: ${DATE}")
+else
+    SECURITY_GROUP_ID=$(aws ec2 create-security-group --group-name ${SECURITY_GROUP_NAME} --description "security group for automatically created instance: ${DATE}")
+fi
 
 echo "Authorizing security group:"
 PUBLIC_IP=`curl https://ipinfo.io/ip`
@@ -170,7 +177,7 @@ echo ""
 ##########################################################################################
 #Check for key pair and create it if it does not exist.
 ##########################################################################################
-if [ ! -f ~/.ssh/${IDENTITY_FILE}.pem ]; then
+if [[ ! -f ~/.ssh/${IDENTITY_FILE}.pem || ${IDENTITY_FILE} ]]; then
     echo "Creating key pair"
     aws ec2 create-key-pair --key-name "${IDENTITY_FILE}" --query 'KeyMaterial' --output text > ~/.ssh/${IDENTITY_FILE}.pem
     chmod 400 ~/.ssh/${IDENTITY_FILE}.pem
@@ -197,22 +204,22 @@ fi
 
 #test if instance is running
 if [[ ${CLUSTER_SIZE} > 1 ]]; then
-TESTVAR=$(aws ec2 describe-instance-status --filters 'Name=tag:cluster,Values=fusion' | grep passed)
-COUNTER=0
-echo "Starting instance (this might take a while)"
-echo -n "Initializing"
+    TESTVAR=$(aws ec2 describe-instance-status --filters 'Name=tag:cluster,Values=fusion' | grep passed)
+    COUNTER=0
+    echo "Starting instance (this might take a while)"
+    echo -n "Initializing"
 
-while [ "${TESTVAR}" == "" ]; do
-        echo -n "."
-        sleep 1
-        COUNTER=$(($COUNTER + 1))
-        TESTVAR=$(aws ec2 describe-instance-status --instance-id "${INSTANCE_ID}" | grep passed)
+    while [ "${TESTVAR}" == "" ]; do
+            echo -n "."
+            sleep 1
+            COUNTER=$(($COUNTER + 1))
+            TESTVAR=$(aws ec2 describe-instance-status --instance-id "${INSTANCE_ID}" | grep passed)
     done
 else
-TESTVAR=$(aws ec2 describe-instance-status --instance-ids "${INSTANCE_ID}" | grep passed)
-COUNTER=0
-echo "Starting instance (this might take a while)"
-echo -n "Initializing"
+    TESTVAR=$(aws ec2 describe-instance-status --instance-ids "${INSTANCE_ID}" | grep passed) || exit 1
+    COUNTER=0
+    echo "Starting instance (this might take a while)"
+    echo -n "Initializing"
 
     while [ "${TESTVAR}" == "" ]; do
         echo -n "."

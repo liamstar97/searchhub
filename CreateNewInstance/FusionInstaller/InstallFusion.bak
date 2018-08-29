@@ -13,86 +13,87 @@ username_set=0
 hostname_set=0
 
 #options
-if [ $# -gt 0 ]; then
-    while true; do
-        case "$1" in
+options=$(getopt -o -d:f:hH:l:i:s:t:u: --long fusion_home:,help,hostname:,fusion-license:,identity:,searchhub_home:,twigkit-credentials:,username: -- "$@")
+[ $? -eq 0 ] || {
+    echo "exiting"
+    exit 1
+}
+eval set -- "$options"
+while true; do
+    case $1 in
             -d  | --datasource-quantity)
-                if [[ -z "$2" || "${2:0:1}" == "-" ]]; then
-                    print_usage "a list of datasources is required when using the $1 option!"
-                    exit 1
+                if [[ $2 == -* ]]; then
+                    missing_argument=${1}
                 fi
                 DATA_SOURCES=${2}
                 shift 2
-            ;;
+                ;;
             -f  | --fusion_home)
-                if [[ -z "$2" || "${2:0:1}" == "-" ]]; then
-                    print_usage "path for fusion home is required when using the $1 option!"
-                    exit 1
+                if [[ $2 == -* ]]; then
+                    missing_argument=${1}
                 fi
                 FUSION_HOME=${2}
                 fusion_home_set=1
                 shift 2
-            ;;
+                ;;
             -h  | --help)
                 cat ./README
                 exit 1
-            ;;
+                ;;
             -H  | --hostname)
-                if [[ -z "$2" || "${2:0:1}" == "-" ]]; then
-                    print_usage "hostname is required when using the $1 option!"
-                    exit 1
+                if [[ $2 == -* ]]; then
+                    missing_argument=${1}
                 fi
                 SSH_HOSTNAME=${2}
                 hostname_set=1
                 shift 2
-            ;;
+                ;;
             -l  | --fusion-license)
-                if [[ -z "$2" || "${2:0:1}" == "-" ]]; then
-                    print_usage "path to license.properties is required when using the $1 option!"
-                    exit 1
+                if [[ $2 == -* ]]; then
+                    missing_argument=${1}
                 fi
                 shift 2
-            ;;
+                ;;
             -i  | --identity)
-                if [[ -z "$2" || "${2:0:1}" == "-" ]]; then
-                    print_usage "ssh identity is required when using the $1 option!"
-                    exit 1
+                if [[ $2 == -* ]]; then
+                    missing_argument=${1}
                 fi
                 IDENTITY_FILE=${2}
                 shift 2
-            ;;
+                ;;
             -s  | --searchhub_home)
-                if [[ -z "$2" || "${2:0:1}" == "-" ]]; then
-                    print_usage "path for searchhub home is required when using the $1 option!"
-                    exit 1
+                if [[ $2 == -* ]]; then
+                    missing_argument=${1}
                 fi
                 SEARCHHUB_HOME=${2}
                 searchhub_home_set=1
                 shift 2
-            ;;
+                ;;
             -t  | --twigkit-credentials)
-                if [[ -z "$2" || "${2:0:1}" == "-" ]]; then
-                    print_usage "path to settings.xml is required when using the $1 option!"
-                    exit 1
+                if [[ $2 == -* ]]; then
+                    missing_argument=${1}
                 fi
                 TWIGKIT_CREDENTIALS=${2}
                 shift 2
-            ;;
+                ;;
             -u  | --username)
-                if [[ -z "$2" || "${2:0:1}" == "-" ]]; then
-                    print_usage "username is required when using the $1 option!"
-                    exit 1
+                if [[ $2 == -* ]]; then
+                    missing_argument=${1}
                 fi
                 USERNAME=${2}
                 username_set=1
                 shift 2
-            ;;
+                ;;
             --)
                 shift
                 break
-            ;;
-        esac
-    done
+                ;;
+    esac
+done
+
+if [ "${missing_argument}" != "" ]; then
+    echo "${missing_argument} requires an argument please use -h or --help"
+    exit 1
 fi
 
 if [ "$USERNAME" != "" ]; then
