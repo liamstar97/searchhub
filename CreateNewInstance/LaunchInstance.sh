@@ -27,78 +27,79 @@ options=$(getopt -o a:c:d:fg:hi:l:r:s:t:u: --long access-key:,cluster-size:,data
 eval set -- "$options"
 while true; do
     case $1 in
-            -c  | --cluster-size)
-                if [[ $2 == -* ]]; then
-                    missing_argument=${1}
-                fi
-                CLUSTER_SIZE=${2}
-                shift 2
-                ;;
-            -d  | --datasource-quantity)
-                if [[ $2 == -* ]]; then
-                    missing_argument=${1}
-                fi
-                DATA_SOURCES=${2}
-                shift 2
-                ;;
-            -f  | --install-fusion)
-                INSTALL_FUSION=1
-                shift
-                ;;
-            -g  | --security-groupname)
-                if [[ $2 == -* ]]; then
-                    missing_argument=${1}
-                fi
-                SECURITY_GROUP_NAME=${2}
-                shift 2
-                ;;
-            -h  | --help)
-                cat ./README
+        -c|--cluster-size)
+              if [[ -z "$2" || "${2:0:1}" == "-" ]]; then
+                print_usage "Spark Master URL is required when using the $1 option!"
                 exit 1
-                ;;
-            -i  | --identity)
-                if [[ $2 == -* ]]; then
-                    missing_argument=${1}
-                fi
-                IDENTITY_FILE=${2}
-                shift 2
-                ;;
-            -l  | --fusion-license)
-                FUSION_LICENSE=${2}
-                shift 2
-                ;;
-            -r  | --region-name)
-                if [[ $2 == -* ]]; then
-                    missing_argument=${1}
-                fi
-                REGION=${2}
-                shift 2
-                ;;
-            -t  | --twigkit-credentials)
-                if [[ $2 == -* ]]; then
-                    missing_argument=${1}
-                fi
-                TWIGKIT_CREDENTIALS=${2}
-                shift 2
-                ;;
-            -u  | --username)
-                if [[ $2 == -* ]]; then
-                    missing_argument=${1}
-                fi
-                USERNAME=${2}
-                shift 2
-                ;;
-            -v  | --volume-size)
-                if [[ $2 == -* ]]; then
-                    missing_argument=${1}
-                fi
-                VOLUME_SIZE=${2}
-                shift 2
-                ;;
-            --)
-                shift
-                break
-                ;;
+              fi
+            CLUSTER_SIZE=${2}
+            shift 2
+        ;;
+        -d|--datasource-quantity)
+            if [[ $2 == -* ]]; then
+                missing_argument=${1}
+            fi
+            DATA_SOURCES=${2}
+            shift 2
+        ;;
+        -f|--install-fusion)
+            INSTALL_FUSION=1
+            shift
+        ;;
+        -g|--security-groupname)
+            if [[ $2 == -* ]]; then
+                missing_argument=${1}
+            fi
+            SECURITY_GROUP_NAME=${2}
+            shift 2
+        ;;
+        -h|--help)
+            cat ./README
+            exit 1
+        ;;
+        -i|--identity)
+            if [[ $2 == -* ]]; then
+                missing_argument=${1}
+            fi
+            IDENTITY_FILE=${2}
+            shift 2
+        ;;
+        -l|--fusion-license)
+            FUSION_LICENSE=${2}
+            shift 2
+        ;;
+        -r|--region-name)
+            if [[ $2 == -* ]]; then
+                missing_argument=${1}
+            fi
+            REGION=${2}
+            shift 2
+        ;;
+        -t|--twigkit-credentials)
+            if [[ $2 == -* ]]; then
+                missing_argument=${1}
+            fi
+            TWIGKIT_CREDENTIALS=${2}
+            shift 2
+        ;;
+        -u|--username)
+            if [[ $2 == -* ]]; then
+                missing_argument=${1}
+            fi
+            USERNAME=${2}
+            shift 2
+        ;;
+        -v|--volume-size)
+            if [[ $2 == -* ]]; then
+                missing_argument=${1}
+            fi
+            VOLUME_SIZE=${2}
+            shift 2
+        ;;
+        --)
+            shift
+            break
+            ;;
     esac
 done
 
