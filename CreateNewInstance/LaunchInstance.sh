@@ -18,90 +18,108 @@ if [ $# == 0 ]; then
     exit 1
 fi
 
-#options
-options=$(getopt -o a:c:d:fg:hi:l:r:s:t:u: --long access-key:,cluster-size:,datasource-quantity:,install-fusion,security-groupname:,region-name:,secret-key:,twigkit-credentials:,help,identity:,fusion-license:,username: -- "$@")
-[ $? -eq 0 ] || {
-    echo "exiting"
-    exit 1
+function print_usage() {
+    ERROR_MSG="$1"
+
+    if [ "$ERROR_MSG" != "" ]; then
+        echo -e "\nERROR: $ERROR_MSG\n"
+    fi
+
+    echo
+    cat ${INSTALLER_HOME}/README
 }
-eval set -- "$options"
-while true; do
-    case $1 in
-        -c|--cluster-size)
-              if [[ -z "$2" || "${2:0:1}" == "-" ]]; then
-                print_usage "Spark Master URL is required when using the $1 option!"
-                exit 1
-              fi
-            CLUSTER_SIZE=${2}
-            shift 2
-        ;;
-        -d|--datasource-quantity)
-            if [[ $2 == -* ]]; then
-                missing_argument=${1}
-            fi
-            DATA_SOURCES=${2}
-            shift 2
-        ;;
-        -f|--install-fusion)
-            INSTALL_FUSION=1
-            shift
-        ;;
-        -g|--security-groupname)
-            if [[ $2 == -* ]]; then
-                missing_argument=${1}
-            fi
-            SECURITY_GROUP_NAME=${2}
-            shift 2
-        ;;
-        -h|--help)
-            cat ./README
-            exit 1
-        ;;
-        -i|--identity)
-            if [[ $2 == -* ]]; then
-                missing_argument=${1}
-            fi
-            IDENTITY_FILE=${2}
-            shift 2
-        ;;
-        -l|--fusion-license)
-            FUSION_LICENSE=${2}
-            shift 2
-        ;;
-        -r|--region-name)
-            if [[ $2 == -* ]]; then
-                missing_argument=${1}
-            fi
-            REGION=${2}
-            shift 2
-        ;;
-        -t|--twigkit-credentials)
-            if [[ $2 == -* ]]; then
-                missing_argument=${1}
-            fi
-            TWIGKIT_CREDENTIALS=${2}
-            shift 2
-        ;;
-        -u|--username)
-            if [[ $2 == -* ]]; then
-                missing_argument=${1}
-            fi
-            USERNAME=${2}
-            shift 2
-        ;;
-        -v|--volume-size)
-            if [[ $2 == -* ]]; then
-                missing_argument=${1}
-            fi
-            VOLUME_SIZE=${2}
-            shift 2
-        ;;
-        --)
-            shift
-            break
+
+#options
+if [ $# -gt 0 ]; then
+    while true; do
+        case "$1" in
+            -c|--cluster-size)
+                if [[ -z "$2" || "${2:0:1}" == "-" ]]; then
+                    print_usage "cluster size is required when using the $1 option!"
+                    exit 1
+                fi
+                CLUSTER_SIZE=${2}
+                shift 2
             ;;
-    esac
-done
+            -d|--datasource-quantity)
+                if [[ -z "$2" || "${2:0:1}" == "-" ]]; then
+                    print_usage "Spark Master URL is required when using the $1 option!"
+                    exit 1
+                fi
+                DATA_SOURCES=${2}
+                shift 2
+            ;;
+            -f|--install-fusion)
+                INSTALL_FUSION=1
+                shift
+            ;;
+            -g|--security-groupname)
+                if [[ -z "$2" || "${2:0:1}" == "-" ]]; then
+                    print_usage "Spark Master URL is required when using the $1 option!"
+                    exit 1
+                fi
+                SECURITY_GROUP_NAME=${2}
+                shift 2
+            ;;
+            -h|--help)
+                cat ./README
+                exit 1
+            ;;
+            -i|--identity)
+                if [[ -z "$2" || "${2:0:1}" == "-" ]]; then
+                    print_usage "Spark Master URL is required when using the $1 option!"
+                    exit 1
+                fi
+                IDENTITY_FILE=${2}
+                shift 2
+            ;;
+            -l|--fusion-license)
+                FUSION_LICENSE=${2}
+                shift 2
+            ;;
+            -r|--region-name)
+                if [[ -z "$2" || "${2:0:1}" == "-" ]]; then
+                    print_usage "Spark Master URL is required when using the $1 option!"
+                    exit 1
+                fi
+                REGION=${2}
+                shift 2
+            ;;
+            -t|--twigkit-credentials)
+                if [[ -z "$2" || "${2:0:1}" == "-" ]]; then
+                    print_usage "Spark Master URL is required when using the $1 option!"
+                    exit 1
+                fi
+                TWIGKIT_CREDENTIALS=${2}
+                shift 2
+            ;;
+            -u|--username)
+                if [[ -z "$2" || "${2:0:1}" == "-" ]]; then
+                    print_usage "Spark Master URL is required when using the $1 option!"
+                    exit 1
+                fi
+                USERNAME=${2}
+                shift 2
+            ;;
+            -v|--volume-size)
+                if [[ -z "$2" || "${2:0:1}" == "-" ]]; then
+                    print_usage "Spark Master URL is required when using the $1 option!"
+                    exit 1
+                fi
+                VOLUME_SIZE=${2}
+                shift 2
+            ;;
+            *)
+                if [ "$1" != "" ]; then
+                    PASS_THRU_ARGS+=("$1")
+                    shift
+                else
+                    break
+              fi
+            ;;
+        esac
+    done
+fi
 
 if [ "${missing_argument}" != "" ]; then
     echo "${missing_argument} requires an argument please use -h or --help"
@@ -144,8 +162,8 @@ fi
 if ! type "aws" > /dev/null; then
     echo "installing aws api"
     pip install awscli --upgrade --user
-    export PATH=
-    source
+    export PATH=~/.local/bin:$PATH
+    source $PATH
     echo "you must run \"aws configure\" on the commandline to complete the aws cli setup"
     exit 1;
 else

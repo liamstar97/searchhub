@@ -21,14 +21,15 @@ sudo apt-get -y -qq install zip
 echo ""
 echo ""
 
-echo "Stopping Fusion services"
-${FUSION_HOME}/bin/fusion stop
-echo ""
-echo ""
+if [
+    echo "Stopping Fusion services"
+    ${FUSION_HOME}/bin/fusion stop
+    echo ""
+    echo ""
 
-echo "Removing old Fusion install"
-rm -r ${FUSION_HOME}
-echo ""
+    echo "Removing old Fusion install"
+    rm -r ${FUSION_HOME}
+    echo ""
 
 if [ ! -e "/home/${USERNAME}/fusion-4.1.0.tar.gz" ]; then
 echo "Fusion file not found, downloading!"

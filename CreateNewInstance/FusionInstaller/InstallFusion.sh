@@ -32,7 +32,7 @@ function print_usage() {
 if [ $# -gt 0 ]; then
     while true; do
         case "$1" in
-            -d|--datasource-quantity)
+            -d|--datasource-list)
                 if [[ -z "$2" || "${2:0:1}" == "-" ]]; then
                     print_usage "a list of datasources is required when using the $1 option!"
                     exit 1

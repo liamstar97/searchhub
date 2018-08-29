@@ -1,20 +1,29 @@
 Usage: InstallFusion.sh [OPTIONS]
 
 Used for the creation of Fusion services utilizing searchhub with AWS services
-   -f | --fusion_home [PATH]
-				Set desired Fusion home directory, if not set
-				this will default to: /home/<username>/fusion/4.1.0
-   -h | --help			Displays help
-   -H | --hostname [HOSTNAME]
-				Set the hostname that will be used for SSH and SCP protocalls
-   -i | --identity [IDENTITY FILE]
-				Set the identity file that will be used for SSH and SCP protocalls
-   -s | --searchhub_home [PATH] 	
-				Set desired SearchHub home directory, if not set
-				this will default to: /home/<username>/src/lucidworks/searchhub
-   -u | --username [USERNAME]
-				Set the username that will be used for SSH and SCP protocalls,
-				as well as Fusion/SearchHub home directories
+	-d | --datasource-list [comma-seperated-list]	
+					input a comma seperated list of datasourcesto index
+	-f | --fusion_home [PATH]
+					Set desired Fusion home directory, if not set
+					this will default to: /home/<username>/fusion/4.1.0
+	-h | --help			
+					Displays help
+	-H | --hostname [HOSTNAME]
+					Set the hostname that will be used for SSH and SCP protocalls
+	-l | --fusion-license [PATH]
+					Set the path to license.properties for fusion licensing.
+					Exclude this option if you plan on uploading it manualy.
+	-i | --identity [IDENTITY FILE PATH]
+					Set the identity file that will be used for SSH and SCP protocalls
+	-s | --searchhub_home [PATH] 	
+					Set desired SearchHub home directory, if not set
+					this will default to: /home/<username>/src/lucidworks/searchhub
+	-t | --twigkit_credentials [PATH]	
+					set the path to the settings.xml file that gradle will use when building searchhub
+	-u | --username [USERNAME]
+					Set the username that will be used for SSH and SCP protocalls,
+					as well as Fusion/SearchHub home directories. This will default
+					to: ubuntu
 
 The hostname, username, and indentity_file flags are required due to the dependancies of SSH and SCP,
 otherwise all other flags have default variables set.
