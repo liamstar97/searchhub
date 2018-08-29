@@ -10,7 +10,7 @@ DATA_SOURCES=0
 CLUSTER_SIZE=0
 FUSION_LICENSE="0"
 TWIGKIT_CREDENTIALS="0"
-VPC_ID=""
+VPC_ID="0"
 
 #Checks for options, exits if none are used
 if [ $# == 0 ]; then
@@ -163,7 +163,7 @@ fi
 #Check for security group and create it if it does not exist.
 ##########################################################################################
 echo "Creating security group"
-if [[ VPC-ID != "" ]]; then
+if [[ ${VPC_ID} != 0 ]]; then
     SECURITY_GROUP_ID=$(aws ec2 create-security-group --group-name ${SECURITY_GROUP_NAME} --vpc-id  --description "security group for automatically created instance: ${DATE}")
 else
     SECURITY_GROUP_ID=$(aws ec2 create-security-group --group-name ${SECURITY_GROUP_NAME} --description "security group for automatically created instance: ${DATE}")
@@ -201,6 +201,8 @@ else
     echo "Security Group ID: ${SECURITY_GROUP_ID:18:20}"
 fi
 
+#exit if something went wrong while creating instance
+aws ec2 describe-instance-status --instance-id "${INSTANCE_ID}" || exit 1
 
 #test if instance is running
 if [[ ${CLUSTER_SIZE} > 1 ]]; then
@@ -210,13 +212,13 @@ if [[ ${CLUSTER_SIZE} > 1 ]]; then
     echo -n "Initializing"
 
     while [ "${TESTVAR}" == "" ]; do
-            echo -n "."
+            echo -n "."git
             sleep 1
             COUNTER=$(($COUNTER + 1))
             TESTVAR=$(aws ec2 describe-instance-status --instance-id "${INSTANCE_ID}" | grep passed)
     done
 else
-    TESTVAR=$(aws ec2 describe-instance-status --instance-ids "${INSTANCE_ID}" | grep passed) || exit 1
+    TESTVAR=$(aws ec2 describe-instance-status --instance-ids "${INSTANCE_ID}" | grep passed)
     COUNTER=0
     echo "Starting instance (this might take a while)"
     echo -n "Initializing"
