@@ -92,6 +92,9 @@ echo ""
 
 echo "Installation Complete!"
 
+#delete settings.xml
+rm -f ~/.m2/settings.xml
+
 if [ ${DATA_SOURCES} == "" ]; then
     echo "Indexing datasources"
     ~/IndexSearchHubDatasources.sh -d ${DATA_SOURCES}
