@@ -38,7 +38,7 @@ if [ $# -gt 0 ]; then
                     shift
                 else
                     break
-              fi
+                fi
             ;;
         esac
     done

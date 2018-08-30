@@ -1,16 +1,14 @@
 #!/bin/bash
 
 INSTALLER_HOME="$(dirname -- "${BASH_SOURCE-$0}")"
-USERNAME=ubuntu
-DATA_SOURCES=0
+USERNAME=""
+DATA_SOURCES=""
 TWIGKIT_CREDENTIALS=""
 FUSION_LICENSE=""
-
-
-fusion_home_set=0
-searchhub_home_set=0
-username_set=0
-hostname_set=0
+WIPE_OLD_INSTALL=0
+FUSION_HOME=""
+SEARCHHUB_HOME=""
+USERNAME=""
 
 if [ $# == 0 ]; then
     echo "missing options, please use -h or --help to see all available options"
@@ -24,8 +22,42 @@ function print_usage() {
         echo -e "\nERROR: $ERROR_MSG\n"
     fi
 
-    echo
-    cat ${INSTALLER_HOME}/README
+    echo "Usage: InstallFusion.sh [-d Datasources] [-f Fusion home] [-h Help] [-H Hostname] [-l Fusion license]"
+	echo "                        [-i SSH key] [-s SearchHub home] [-t Twigkit credentials] [-u Username]"
+	echo ""
+    echo "Used for the creation of Fusion services utilizing searchhub with AWS services"
+    echo ""
+	echo "  -d|--datasource-list [comma-seperated-list]"
+	echo "                                  input a comma separated list of datasources to index"
+	echo "  -f|--fusion_home [PATH]"
+	echo "                                  Set desired Fusion home directory, if not set"
+	echo "                                  this will default to: /home/<username>/fusion/4.1.0"
+	echo "  -h|--help"
+	echo "                                  Displays help"
+	echo "  -H|--hostname [HOSTNAME]"
+	echo "                                  Set the hostname that will be used for SSH and SCP protocalls"
+	echo "  -l|--fusion-license [PATH]"
+	echo "                                  Set the path to license.properties for fusion licensing."
+	echo "                                  Exclude this option if you plan on uploading it manualy."
+	echo "  -i|--identity [IDENTITY FILE PATH]"
+	echo "                                  Set the identity file or key that will be used for SSH and SCP protocalls"
+	echo "  -s|--searchhub_home [PATH]"
+	echo "                                  Set desired SearchHub home directory, if not set"
+	echo "                                  this will default to: /home/<username>/src/lucidworks/searchhub"
+	echo "  -t|--twigkit_credentials [PATH]"
+	echo "                                  Set the path to the settings.xml file that gradle will use when building searchhub"
+	echo "  -u|--username [USERNAME]"
+	echo "                                  Set the username that will be used for SSH and SCP protocalls,"
+	echo "                                  as well as Fusion/SearchHub home directories. This will default"
+	echo "                                  to: ubuntu"
+    echo ""
+    echo "The hostname, username, and indentity_file flags are required due to the dependancies of SSH and SCP,"
+    echo "otherwise all other flags have default variables set."
+    echo ""
+    echo "Examples: ./InstallFusion.sh -i foobar.pem -u ubuntu -H ec2-11-111-111-111.compute-1.amazonaws.com"
+    echo "          ./InstallFusion.sh --identity foobar.pem --username ubuntu --hostname ec2-11-111-111-111.compute-1.amazonaws.com"
+    echo "          ./InstallFusion.sh -i foobar.pem -u ubuntu -H ec2-11-111-111-111.compute-1.amazonaws.com -f /home/ubuntu/fusion/4.1.0 -s /home/ubuntu/src/lucidworks/searchhub"
+    echo "          ./InstallFusion.sh -i foobar.pem -H ec2-11-111-111-111.compute-1.amazonaws.com -l ~/Documents/foo/license.properties -t ~/Documents/foo/settings.xml"
 }
 
 #options
@@ -50,7 +82,7 @@ if [ $# -gt 0 ]; then
                 shift 2
             ;;
             -h|--help)
-                cat ${INSTALLER_HOME}/README
+            print_usage
                 exit 1
             ;;
             -H|--hostname)
@@ -59,7 +91,6 @@ if [ $# -gt 0 ]; then
                     exit 1
                 fi
                 SSH_HOSTNAME=${2}
-                hostname_set=1
                 shift 2
             ;;
             -l|--fusion-license)
@@ -103,27 +134,35 @@ if [ $# -gt 0 ]; then
                 username_set=1
                 shift 2
             ;;
+            w|--wipe-old-install)
+                WIPE_OLD_INSTALL=1
+                shift 2
+            ;;
+            -*)
+                print_usage "The $1 option does not exist!"
+                exit 1
+            ;;
             *)
                 if [ "$1" != "" ]; then
                     PASS_THRU_ARGS+=("$1")
                     shift
                 else
                     break
-              fi
+                fi
             ;;
         esac
     done
 fi
 
-if [ "$USERNAME" != "" ]; then
+if [[ "$USERNAME" != "" ]]; then
     FUSION_HOME=/home/${USERNAME}/${FUSION_HOME}
 fi
 
-if [ ${fusion_home_set} == 0 ]; then
+if [[ ${FUSION_HOME} == "" ]]; then
     FUSION_HOME=/home/${USERNAME}/fusion
 fi
 
-if [ ${searchhub_home_set} == 0 ]; then
+if [[ ${SEARCHHUB_HOME} == "" ]]; then
     SEARCHHUB_HOME=/home/${USERNAME}/src/lucidworks/searchhub
 fi
 
@@ -132,4 +171,4 @@ echo ${FUSION_LICENSE}
 
 #exports vars and runs UploadFiles.sh
 . ${INSTALLER_HOME}/scripts/UploadFiles.sh
-ssh -i ${IDENTITY_FILE} ${USERNAME}@${SSH_HOSTNAME} "export USERNAME=${USERNAME}; export FUSION_HOME=${FUSION_HOME}; export SEARCHHUB_HOME=${SEARCHHUB_HOME}; export DATA_SOURCES=${DATA_SOURCES}; ./FusionInstaller.sh"
+ssh -i ${IDENTITY_FILE} ${USERNAME}@${SSH_HOSTNAME} "export USERNAME=${USERNAME}; export FUSION_HOME=${FUSION_HOME}; export SEARCHHUB_HOME=${SEARCHHUB_HOME}; export DATA_SOURCES=${DATA_SOURCES}; export WIPE_OLD_INSTALL=${WIPE_OLD_INSTALL}; ./FusionInstaller.sh"
