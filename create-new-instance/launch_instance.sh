@@ -115,7 +115,7 @@ if [ $# -gt 0 ]; then
                     shift
                 else
                     break
-              fi
+                fi
             ;;
         esac
     done
@@ -303,7 +303,7 @@ ssh -Y -i "~/.ssh/${IDENTITY_FILE}.pem" "${USERNAME}@${PUBLIC_DNS}"  "sudo resiz
 ##########################################################################################
 if [ "${INSTALL_FUSION}" == 1 ]; then
     echo "Starting Fusion install with SearchHub"
-    ./FusionInstaller/InstallFusion.sh -i ~/.ssh/${IDENTITY_FILE}.pem -u ${USERNAME} -H ${SSH_HOSTNAME} -d ${DATA_SOURCES} -t ${TWIGKIT_CREDENTIALS} -l ${FUSION_LICENSE}
+    ./fusion-installer/install_fusion.sh -i ~/.ssh/${IDENTITY_FILE}.pem -u ${USERNAME} -H ${SSH_HOSTNAME} -d ${DATA_SOURCES} -t ${TWIGKIT_CREDENTIALS} -l ${FUSION_LICENSE}
 else
     ssh -Y -i ~/.ssh/${IDENTITY_FILE}.pem "${USERNAME}@${SSH_HOSTNAME}"
 fi

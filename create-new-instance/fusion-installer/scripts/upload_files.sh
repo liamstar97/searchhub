@@ -10,8 +10,8 @@ echo "license.properties:" ${FUSION_LICENSE}
 echo "settings.xml:" ${TWIGKIT_CREDENTIALS}
 echo ""
 
-scp -i ${IDENTITY_FILE} ${INSTALLER_HOME}/scripts/FusionInstaller.sh ${USERNAME}@${SSH_HOSTNAME}:
-scp -i ${IDENTITY_FILE} ${INSTALLER_HOME}/scripts/IndexSearchHubDatasources.sh ${USERNAME}@${SSH_HOSTNAME}:
+scp -i ${IDENTITY_FILE} ${INSTALLER_HOME}/scripts/fusion_installer.sh ${USERNAME}@${SSH_HOSTNAME}:
+scp -i ${IDENTITY_FILE} ${INSTALLER_HOME}/scripts/index_searchhub_datasources.sh ${USERNAME}@${SSH_HOSTNAME}:
 scp -i ${IDENTITY_FILE} ${INSTALLER_HOME}/conf/fusion.properties ${USERNAME}@${SSH_HOSTNAME}:
 scp -i ${IDENTITY_FILE} ${INSTALLER_HOME}/conf/myenv.sh.tmpl ${USERNAME}@${SSH_HOSTNAME}:
 scp -i ${IDENTITY_FILE} ${INSTALLER_HOME}/conf/password_file.json.tmpl ${USERNAME}@${SSH_HOSTNAME}:

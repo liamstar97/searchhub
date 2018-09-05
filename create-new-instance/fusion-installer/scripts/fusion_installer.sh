@@ -4,6 +4,8 @@ echo "post ssh"
 FUSION_HOME=${FUSION_HOME}/4.1.0
 SEARCHHUB_HOME=${SEARCHHUB_HOME}
 USERNAME=${USERNAME}
+DATA_SOURCES=${DATA_SOURCES}
+WIPE_OLD_INSTALL=${WIPE_OLD_INSTALL}
 
 echo ${FUSION_HOME}
 echo ${SEARCHHUB_HOME}
@@ -16,17 +18,20 @@ sudo apt-get -y -qq install gradle
 sudo apt-get -y -qq install maven
 sudo apt-get -y -qq install scala
 sudo apt-get -y -qq install default-jdk
+sudo apt-get -y -qq install zip
 echo ""
 echo ""
 
-echo "Stopping Fusion services"
-${FUSION_HOME}/bin/fusion stop
-echo ""
-echo ""
+if [ ${WIPE_OLD_INSTALL} == 1 ]; then
+    echo "Stopping Fusion services"
+    ${FUSION_HOME}/bin/fusion stop
+    echo ""
+    echo ""
 
-#echo "Removing old Fusion install"
-#rm -r ${FUSION_HOME}
-#echo ""
+    echo "Removing old Fusion install"
+    rm -r ${FUSION_HOME}
+    echo ""
+fi
 
 if [ ! -e "/home/${USERNAME}/fusion-4.1.0.tar.gz" ]; then
 echo "Fusion file not found, downloading!"
@@ -42,6 +47,10 @@ echo ""
 
 echo "Editing config files"
 mv fusion.properties ${FUSION_HOME}/conf
+mkdir "~/.fusion"
+mv "license.properties" "~/.fusion"
+mkdir "~/.m2"
+mv "settings.xml" "~/.m2"
 echo ""
 echo ""
 
@@ -81,4 +90,12 @@ ${FUSION_HOME}/bin/connectors restart
 echo ""
 echo ""
 
-echo "Done!"
+echo "Installation Complete!"
+
+#delete settings.xml
+rm -f ~/.m2/settings.xml
+
+if [ ${DATA_SOURCES} == "" ]; then
+    echo "Indexing datasources"
+    ~/index_searchhub_datasources.sh -d ${DATA_SOURCES}
+fi

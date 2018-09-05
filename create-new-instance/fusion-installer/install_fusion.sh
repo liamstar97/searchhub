@@ -22,7 +22,7 @@ function print_usage() {
         echo -e "\nERROR: $ERROR_MSG\n"
     fi
 
-    echo "Usage: InstallFusion.sh [-d Datasources] [-f Fusion home] [-h Help] [-H Hostname] [-l Fusion license]"
+    echo "Usage: install_fusion.sh [-d Datasources] [-f Fusion home] [-h Help] [-H Hostname] [-l Fusion license]"
 	echo "                        [-i SSH key] [-s SearchHub home] [-t Twigkit credentials] [-u Username]"
 	echo ""
     echo "Used for the creation of Fusion services utilizing searchhub with AWS services"
@@ -54,10 +54,10 @@ function print_usage() {
     echo "The hostname, username, and indentity_file flags are required due to the dependancies of SSH and SCP,"
     echo "otherwise all other flags have default variables set."
     echo ""
-    echo "Examples: ./InstallFusion.sh -i foobar.pem -u ubuntu -H ec2-11-111-111-111.compute-1.amazonaws.com"
-    echo "          ./InstallFusion.sh --identity foobar.pem --username ubuntu --hostname ec2-11-111-111-111.compute-1.amazonaws.com"
-    echo "          ./InstallFusion.sh -i foobar.pem -u ubuntu -H ec2-11-111-111-111.compute-1.amazonaws.com -f /home/ubuntu/fusion/4.1.0 -s /home/ubuntu/src/lucidworks/searchhub"
-    echo "          ./InstallFusion.sh -i foobar.pem -H ec2-11-111-111-111.compute-1.amazonaws.com -l ~/Documents/foo/license.properties -t ~/Documents/foo/settings.xml"
+    echo "Examples: ./install_fusion.sh -i foobar.pem -u ubuntu -H ec2-11-111-111-111.compute-1.amazonaws.com"
+    echo "          ./install_fusion.sh --identity foobar.pem --username ubuntu --hostname ec2-11-111-111-111.compute-1.amazonaws.com"
+    echo "          ./install_fusion.sh -i foobar.pem -u ubuntu -H ec2-11-111-111-111.compute-1.amazonaws.com -f /home/ubuntu/fusion/4.1.0 -s /home/ubuntu/src/lucidworks/searchhub"
+    echo "          ./install_fusion.sh -i foobar.pem -H ec2-11-111-111-111.compute-1.amazonaws.com -l ~/Documents/foo/license.properties -t ~/Documents/foo/settings.xml"
 }
 
 #options
@@ -170,5 +170,5 @@ echo ${TWIGKIT_CREDENTIALS}
 echo ${FUSION_LICENSE}
 
 #exports vars and runs UploadFiles.sh
-. ${INSTALLER_HOME}/scripts/UploadFiles.sh
-ssh -i ${IDENTITY_FILE} ${USERNAME}@${SSH_HOSTNAME} "export USERNAME=${USERNAME}; export FUSION_HOME=${FUSION_HOME}; export SEARCHHUB_HOME=${SEARCHHUB_HOME}; export DATA_SOURCES=${DATA_SOURCES}; export WIPE_OLD_INSTALL=${WIPE_OLD_INSTALL}; ./FusionInstaller.sh"
+. ${INSTALLER_HOME}/scripts/upload_files.sh
+ssh -i ${IDENTITY_FILE} ${USERNAME}@${SSH_HOSTNAME} "export USERNAME=${USERNAME}; export FUSION_HOME=${FUSION_HOME}; export SEARCHHUB_HOME=${SEARCHHUB_HOME}; export DATA_SOURCES=${DATA_SOURCES}; export WIPE_OLD_INSTALL=${WIPE_OLD_INSTALL}; ./fusion_installer.sh"
