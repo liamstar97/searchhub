@@ -15,7 +15,7 @@ scp -i ${IDENTITY_FILE} ${INSTALLER_HOME}/scripts/index_searchhub_datasources.sh
 scp -i ${IDENTITY_FILE} ${INSTALLER_HOME}/conf/fusion.properties ${USERNAME}@${SSH_HOSTNAME}:
 scp -i ${IDENTITY_FILE} ${INSTALLER_HOME}/conf/myenv.sh.tmpl ${USERNAME}@${SSH_HOSTNAME}:
 scp -i ${IDENTITY_FILE} ${INSTALLER_HOME}/conf/password_file.json.tmpl ${USERNAME}@${SSH_HOSTNAME}:
-scp -i ${IDENTITY_FILE} ${FUSION_LICENSE} ${USERNAME}@${SSH_HOSTNAME}:
+scp -i ${IDENTITY_FILE} ${FUSION_LICENSE} ${USERNAME}@${SSH_HOSTNAME}:license.properties
 scp -i ${IDENTITY_FILE} ${TWIGKIT_CREDENTIALS} ${USERNAME}@${SSH_HOSTNAME}:
 
 echo "Upload complete"
